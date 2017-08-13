@@ -2,24 +2,14 @@ import 'pixi.js'
 
 class Particle {
 
-  constructor(pos, vel, radius, color = 0xFFFFFF) {
+  constructor(sprite, vel) {
+    this.sprite = sprite
     this.vel = vel
-    this.graphics = new PIXI.Graphics()
-    this.graphics.x = pos.x
-    this.graphics.y = pos.y
-    this.radius = radius
-    this.color = color
   }
 
   update() {
-    this.graphics.x += this.vel.x
-    this.graphics.y += this.vel.y
-  }
-
-  draw() {
-    this.graphics.beginFill(this.color, 0.35)
-    this.graphics.drawCircle(0.0, 0.0, this.radius)
-    this.graphics.endFill()
+    this.sprite.position.x += this.vel.x
+    this.sprite.position.y += this.vel.y
   }
 }
 
@@ -36,26 +26,40 @@ function startApp() {
 
   const numOfParticles = 10000
 
+  const container = new PIXI.particles.ParticleContainer(10000, {
+    scale: false,
+    position: true,
+    rotation: false,
+    uvs: false,
+    alpha: true
+  })
+  app.stage.addChild(container)
+
   let particles = []
 
   for (let i = 0; i < numOfParticles; i += 1) {
     const px = app.view.width * Math.random()
     const py = app.view.height * Math.random()
     const theta = 2 * Math.PI * Math.random()
-    const vx = 2.0 * Math.cos(theta)
-    const vy = 2.0 * Math.sin(theta)
+    const vx = Math.cos(theta)
+    const vy = Math.sin(theta)
     const radius = Math.random() + 1.0
 
-    const particle = new Particle({
-      x: px,
-      y: py
-    }, {
+    const graphics = new PIXI.Graphics()
+    graphics.beginFill(0xFFFFFF, 0.35)
+    graphics.drawCircle(0.0, 0.0, radius)
+    graphics.endFill()
+    const sprite = new PIXI.Sprite(graphics.generateCanvasTexture())
+    sprite.position.x = px
+    sprite.position.y = py
+    sprite.anchor.set(0.5)
+
+    const particle = new Particle(sprite, {
       x: vx,
       y: vy
-    }, radius, 0xFDB2D4)
+    })
     particles.push(particle)
-    app.stage.addChild(particle.graphics)
-    particle.draw()
+    container.addChild(particle.sprite)
   }
 
   app.ticker.add(delta => {
@@ -65,17 +69,17 @@ function startApp() {
     particles.forEach(particle => {
       particle.update()
 
-      if (particle.graphics.x < 0) {
-        particle.graphics.x = app.view.width
+      if (particle.sprite.x < 0) {
+        particle.sprite.x = app.view.width
       }
-      if (app.view.width < particle.graphics.x) {
-        particle.graphics.x = 0.0
+      if (app.view.width < particle.sprite.x) {
+        particle.sprite.x = 0.0
       }
-      if (particle.graphics.y < 0) {
-        particle.graphics.y = app.view.height
+      if (particle.sprite.y < 0) {
+        particle.sprite.y = app.view.height
       }
-      if (app.view.height < particle.graphics.y) {
-        particle.graphics.y = 0.0
+      if (app.view.height < particle.sprite.y) {
+        particle.sprite.y = 0.0
       }
     })
   })
