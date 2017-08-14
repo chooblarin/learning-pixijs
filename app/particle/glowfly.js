@@ -1,56 +1,5 @@
 import 'pixi.js'
 
-class Particle {
-
-  constructor(sprite, vel) {
-    this.sprite = sprite
-    this.vel = vel
-    this.acc = {
-      x: 0.0,
-      y: 0.0
-    }
-
-    this.maxVel = 0.8
-  }
-
-  update() {
-    this.vel.x += this.acc.x
-    this.vel.y += this.acc.y
-    this.sprite.position.x += this.vel.x
-    this.sprite.position.y += this.vel.y
-
-    this.acc.x = 0.0
-    this.acc.y = 0.0
-
-    const v = this.vel.x * this.vel.x + this.vel.y * this.vel.y
-    if (this.maxVel * this.maxVel < v) {
-      this.vel.x *= 0.95
-      this.vel.y *= 0.95
-    }
-  }
-}
-
-const createParticle = pos => {
-  const theta = 2 * Math.PI * Math.random()
-  const vx = Math.cos(theta)
-  const vy = Math.sin(theta)
-  const radius = Math.random() + 1.0
-
-  const graphics = new PIXI.Graphics()
-  graphics.beginFill(0xFFFFFF, 0.35)
-  graphics.drawCircle(0.0, 0.0, radius)
-  graphics.endFill()
-  const sprite = new PIXI.Sprite(graphics.generateCanvasTexture())
-  sprite.position.x = pos.x
-  sprite.position.y = pos.y
-  sprite.anchor.set(0.5)
-
-  return new Particle(sprite, {
-    x: vx,
-    y: vy
-  })
-}
-
 function startApp() {
 
   const app = new PIXI.Application({
@@ -79,9 +28,6 @@ function startApp() {
 
   app.stage.addChild(particleContainer)
 
-  const water = new PIXI.Sprite(null)
-  app.stage.addChild(water)
-
   let particles = []
 
   for (let i = 0; i < numOfParticles; i += 1) {
@@ -95,8 +41,8 @@ function startApp() {
     particleContainer.addChild(particle.sprite)
   }
 
-  var rt = PIXI.RenderTexture.create(waterArea.width, waterArea.height)
-  var waterSprite = new PIXI.Sprite(rt)
+  var renderTexture = PIXI.RenderTexture.create(waterArea.width, waterArea.height)
+  var waterSprite = new PIXI.Sprite(renderTexture)
   waterSprite.tint = 0x5CC8FF
   waterSprite.position.x = waterArea.x
   waterSprite.position.y = app.view.height
@@ -104,7 +50,8 @@ function startApp() {
   app.stage.addChild(waterSprite)
 
   app.ticker.add(delta => {
-    app.renderer.render(particleContainer, rt)
+
+    app.renderer.render(particleContainer, renderTexture)
 
     const cos = Math.cos(delta)
     const sin = Math.sin(delta)
@@ -140,6 +87,57 @@ function startApp() {
       }
     })
   })
+}
+
+const createParticle = pos => {
+  const theta = 2 * Math.PI * Math.random()
+  const vx = Math.cos(theta)
+  const vy = Math.sin(theta)
+  const radius = Math.random() + 1.0
+
+  const graphics = new PIXI.Graphics()
+  graphics.beginFill(0xFCED30, 0.65)
+  graphics.drawCircle(0.0, 0.0, radius)
+  graphics.endFill()
+  const sprite = new PIXI.Sprite(graphics.generateCanvasTexture())
+  sprite.position.x = pos.x
+  sprite.position.y = pos.y
+  sprite.anchor.set(0.5)
+
+  return new Particle(sprite, {
+    x: vx,
+    y: vy
+  })
+}
+
+class Particle {
+
+  constructor(sprite, vel) {
+    this.sprite = sprite
+    this.vel = vel
+    this.acc = {
+      x: 0.0,
+      y: 0.0
+    }
+
+    this.maxVel = 0.8
+  }
+
+  update() {
+    this.vel.x += this.acc.x
+    this.vel.y += this.acc.y
+    this.sprite.position.x += this.vel.x
+    this.sprite.position.y += this.vel.y
+
+    this.acc.x = 0.0
+    this.acc.y = 0.0
+
+    const v = this.vel.x * this.vel.x + this.vel.y * this.vel.y
+    if (this.maxVel * this.maxVel < v) {
+      this.vel.x *= 0.95
+      this.vel.y *= 0.95
+    }
+  }
 }
 
 export default startApp

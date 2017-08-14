@@ -1,4 +1,4 @@
-import startApp from './particle/storm2'
+import startApp from './particle/glowfly'
 import styles from './styles/app.css'
 
 startApp()
