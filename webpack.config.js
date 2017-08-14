@@ -47,7 +47,7 @@ const common = {
       },
       {
         test: /\.(jpe?g|gif|png|svg|woff|ttf|wav|mp3)$/,
-        loaders: 'file'
+        loaders: 'file-loader'
       }
     ]
   }
