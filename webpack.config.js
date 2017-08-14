@@ -39,15 +39,8 @@ const common = {
         loaders: ['style-loader', 'css-loader?modules&localIdentName=[name]__[local]__[hash:base64:5]']
       },
       {
-        test: /\.(jpg|png|svg)$/,
-        loader: 'url-loader',
-        options: {
-          limit: 25000
-        }
-      },
-      {
         test: /\.(jpe?g|gif|png|svg|woff|ttf|wav|mp3)$/,
-        loaders: 'file-loader'
+        loaders: 'file-loader?name=[path][name].[ext]'
       }
     ]
   }

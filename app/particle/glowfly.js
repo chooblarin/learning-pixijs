@@ -1,4 +1,5 @@
 import 'pixi.js'
+import noiseMap from "../assets/images/noise_map.png"
 
 function startApp() {
 
@@ -40,6 +41,13 @@ function startApp() {
     particles.push(particle)
     particleContainer.addChild(particle.sprite)
   }
+
+  const noiseMapImage = PIXI.Sprite.fromImage(noiseMap)
+  app.stage.addChild(noiseMapImage)
+  noiseMapImage.position.y = waterArea.y
+
+  const displacementFilter = new PIXI.filters.DisplacementFilter(noiseMapImage, 24)
+  app.stage.filters = [displacementFilter]
 
   var renderTexture = PIXI.RenderTexture.create(waterArea.width, waterArea.height)
   var waterSprite = new PIXI.Sprite(renderTexture)
