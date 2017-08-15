@@ -59,7 +59,9 @@ function startApp() {
   const noiseMapImage = PIXI.Sprite.fromImage(noiseMap)
   waterContainer.addChild(noiseMapImage)
 
-  const displacementFilter = new PIXI.filters.DisplacementFilter(noiseMapImage, 24)
+  const displacementFilter = new PIXI.filters.DisplacementFilter(noiseMapImage, waterArea.width, waterArea.height)
+  displacementFilter.scale.x = 50
+  displacementFilter.scale.y = 50
   waterContainer.filters = [displacementFilter]
 
   var renderTexture = PIXI.RenderTexture.create(particleArea.width, particleArea.height)
@@ -69,9 +71,15 @@ function startApp() {
   waterSprite.position.y = waterArea.height
   waterContainer.addChild(waterSprite)
 
+  let count = 0.0
+
   app.ticker.add(delta => {
+    count += 0.1 * delta
 
     app.renderer.render(particleContainer, renderTexture)
+
+    displacementFilter.x = count * 10
+    displacementFilter.y = count * 10
 
     const cos = Math.cos(delta)
     const sin = Math.sin(delta)
