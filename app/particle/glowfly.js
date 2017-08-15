@@ -16,8 +16,10 @@ function startApp() {
 
   const numOfParticles = 100
 
-  const particleArea = new PIXI.Rectangle(0, 0, app.view.width, app.view.height / 2.0)
-  const waterArea = new PIXI.Rectangle(0, app.view.height / 2.0, app.view.width, app.view.height / 2.0)
+  const waterAreaRatio = 0.40
+  const particleAreaRatio = 1.0 - waterAreaRatio
+  const particleArea = new PIXI.Rectangle(0, 0, app.view.width, app.view.height * particleAreaRatio)
+  const waterArea = new PIXI.Rectangle(0, app.view.height * particleAreaRatio, app.view.width, app.view.height * waterAreaRatio)
 
   const particleContainer = new PIXI.particles.ParticleContainer(10000, {
     scale: false,
@@ -26,8 +28,20 @@ function startApp() {
     uvs: false,
     alpha: true
   })
+  const waterContainer = new PIXI.Container()
+
+  particleContainer.x = particleArea.x
+  particleContainer.y = particleArea.y
+  particleContainer.width = particleArea.width
+  particleContainer.height = particleArea.height
+
+  waterContainer.x = waterArea.x
+  waterContainer.y = waterArea.y
+  waterContainer.width = waterArea.width
+  waterContainer.height = waterArea.height
 
   app.stage.addChild(particleContainer)
+  app.stage.addChild(waterContainer)
 
   let particles = []
 
@@ -43,19 +57,17 @@ function startApp() {
   }
 
   const noiseMapImage = PIXI.Sprite.fromImage(noiseMap)
-  app.stage.addChild(noiseMapImage)
-  noiseMapImage.position.y = waterArea.y
+  waterContainer.addChild(noiseMapImage)
 
   const displacementFilter = new PIXI.filters.DisplacementFilter(noiseMapImage, 24)
-  app.stage.filters = [displacementFilter]
+  waterContainer.filters = [displacementFilter]
 
-  var renderTexture = PIXI.RenderTexture.create(waterArea.width, waterArea.height)
+  var renderTexture = PIXI.RenderTexture.create(particleArea.width, particleArea.height)
   var waterSprite = new PIXI.Sprite(renderTexture)
   waterSprite.tint = 0x5CC8FF
-  waterSprite.position.x = waterArea.x
-  waterSprite.position.y = app.view.height
-  waterSprite.scale.y = -1.0
-  app.stage.addChild(waterSprite)
+  waterSprite.scale.y = -waterAreaRatio / particleAreaRatio
+  waterSprite.position.y = waterArea.height
+  waterContainer.addChild(waterSprite)
 
   app.ticker.add(delta => {
 
