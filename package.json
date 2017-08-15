@@ -24,6 +24,7 @@
     "webpack-merge": "^4.1.0"
   },
   "dependencies": {
+    "@pixi/filter-glow": "^2.0.0",
     "pixi.js": "^4.5.4"
   }
 }
