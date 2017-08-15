@@ -14,12 +14,25 @@ function startApp() {
 
   document.body.appendChild(app.view);
 
-  const numOfParticles = 100
+  const numOfParticles = 500
 
   const waterAreaRatio = 0.40
   const particleAreaRatio = 1.0 - waterAreaRatio
   const particleArea = new PIXI.Rectangle(0, 0, app.view.width, app.view.height * particleAreaRatio)
   const waterArea = new PIXI.Rectangle(0, app.view.height * particleAreaRatio, app.view.width, app.view.height * waterAreaRatio)
+
+  const background = new PIXI.Container()
+  app.stage.addChild(background)
+  const graphics = new PIXI.Graphics()
+  background.addChild(graphics)
+
+  graphics.beginFill(0x0B1217)
+  graphics.drawRect(particleArea.x, particleArea.y, particleArea.width, particleArea.height)
+  graphics.endFill()
+
+  graphics.beginFill(0x071E42)
+  graphics.drawRect(waterArea.x, waterArea.y, waterArea.width, waterArea.height)
+  graphics.endFill()
 
   const particleContainer = new PIXI.particles.ParticleContainer(10000, {
     scale: false,
