@@ -60,7 +60,7 @@ function startApp() {
   app.view.style['display'] = 'block'
   app.view.style['margin'] = '0 auto'
 
-  document.body.appendChild(app.view);
+  document.body.appendChild(app.view)
 
   const numOfParticles = 10000
 
