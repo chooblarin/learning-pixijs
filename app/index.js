@@ -1,4 +1,4 @@
-import startApp from './filter/neon'
+import startApp from './particle/glowfly'
 import styles from './styles/app.css'
 
 startApp()

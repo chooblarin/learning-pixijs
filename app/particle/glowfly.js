@@ -25,8 +25,7 @@ function startApp() {
   app.stage.addChild(background)
   const graphics = new PIXI.Graphics()
   background.addChild(graphics)
-
-  graphics.beginFill(0x0B1217)
+  graphics.beginFill(0x0B1319)
   graphics.drawRect(particleArea.x, particleArea.y, particleArea.width, particleArea.height)
   graphics.endFill()
 
@@ -72,14 +71,14 @@ function startApp() {
   const noiseMapImage = PIXI.Sprite.fromImage(noiseMap)
   waterContainer.addChild(noiseMapImage)
 
+  const blurFilter = new PIXI.filters.BlurFilter(0.2, 1)
   const displacementFilter = new PIXI.filters.DisplacementFilter(noiseMapImage, waterArea.width, waterArea.height)
   displacementFilter.scale.x = 50
   displacementFilter.scale.y = 50
-  waterContainer.filters = [displacementFilter]
+  waterContainer.filters = [displacementFilter, blurFilter]
 
   var renderTexture = PIXI.RenderTexture.create(particleArea.width, particleArea.height)
   var waterSprite = new PIXI.Sprite(renderTexture)
-  waterSprite.tint = 0x5CC8FF
   waterSprite.scale.y = -waterAreaRatio / particleAreaRatio
   waterSprite.position.y = waterArea.height
   waterContainer.addChild(waterSprite)
@@ -137,7 +136,7 @@ const createParticle = pos => {
   const radius = Math.random() + 1.0
 
   const graphics = new PIXI.Graphics()
-  graphics.beginFill(0xFCED30, 0.65)
+  graphics.beginFill(0xF2FE00, 0.65)
   graphics.drawCircle(0.0, 0.0, radius)
   graphics.endFill()
   const sprite = new PIXI.Sprite(graphics.generateCanvasTexture())
