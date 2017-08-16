@@ -1,4 +1,7 @@
 import 'pixi.js'
+import {
+  GlowFilter
+} from '@pixi/filter-glow'
 import noiseMap from "../assets/images/noise_map.png"
 
 function startApp() {
@@ -14,25 +17,27 @@ function startApp() {
 
   document.body.appendChild(app.view)
 
-  const numOfParticles = 500
+  const numOfParticles = 200
 
   const waterAreaRatio = 0.40
-  const particleAreaRatio = 1.0 - waterAreaRatio
-  const particleArea = new PIXI.Rectangle(0, 0, app.view.width, app.view.height * particleAreaRatio)
-  const waterArea = new PIXI.Rectangle(0, app.view.height * particleAreaRatio, app.view.width, app.view.height * waterAreaRatio)
+  const airAreaRatio = 1.0 - waterAreaRatio
+  const airArea = new PIXI.Rectangle(0, 0, app.view.width, app.view.height * airAreaRatio)
+  const waterArea = new PIXI.Rectangle(0, app.view.height * airAreaRatio, app.view.width, app.view.height * waterAreaRatio)
 
   const background = new PIXI.Container()
   app.stage.addChild(background)
   const graphics = new PIXI.Graphics()
   background.addChild(graphics)
   graphics.beginFill(0x0B1319)
-  graphics.drawRect(particleArea.x, particleArea.y, particleArea.width, particleArea.height)
+  graphics.drawRect(airArea.x, airArea.y, airArea.width, airArea.height)
   graphics.endFill()
 
   graphics.beginFill(0x071E42)
   graphics.drawRect(waterArea.x, waterArea.y, waterArea.width, waterArea.height)
   graphics.endFill()
 
+  const airContainer = new PIXI.Container()
+  const waterContainer = new PIXI.Container()
   const particleContainer = new PIXI.particles.ParticleContainer(10000, {
     scale: false,
     position: true,
@@ -40,26 +45,25 @@ function startApp() {
     uvs: false,
     alpha: true
   })
-  const waterContainer = new PIXI.Container()
 
-  particleContainer.x = particleArea.x
-  particleContainer.y = particleArea.y
-  particleContainer.width = particleArea.width
-  particleContainer.height = particleArea.height
+  airContainer.x = airArea.x
+  airContainer.y = airArea.y
+  airContainer.width = airArea.width
+  airContainer.height = airArea.height
 
   waterContainer.x = waterArea.x
   waterContainer.y = waterArea.y
   waterContainer.width = waterArea.width
   waterContainer.height = waterArea.height
 
-  app.stage.addChild(particleContainer)
+  app.stage.addChild(airContainer)
   app.stage.addChild(waterContainer)
 
   let particles = []
 
   for (let i = 0; i < numOfParticles; i += 1) {
-    const px = particleArea.width * Math.random()
-    const py = particleArea.height * Math.random()
+    const px = airArea.width * Math.random()
+    const py = airArea.height * Math.random()
     const particle = createParticle({
       x: px,
       y: py
@@ -68,18 +72,24 @@ function startApp() {
     particleContainer.addChild(particle.sprite)
   }
 
+  airContainer.addChild(particleContainer)
+
   const noiseMapImage = PIXI.Sprite.fromImage(noiseMap)
   waterContainer.addChild(noiseMapImage)
 
-  const blurFilter = new PIXI.filters.BlurFilter(0.2, 1)
+  const glowFilter = new GlowFilter(15, 4.0, 1.0, 0xF2FE00, 0.4)
+  airContainer.filterArea = airArea
+  airContainer.filters = [glowFilter]
+
+  const blurFilter = new PIXI.filters.BlurFilter(0.2, 0.5)
   const displacementFilter = new PIXI.filters.DisplacementFilter(noiseMapImage, waterArea.width, waterArea.height)
   displacementFilter.scale.x = 50
   displacementFilter.scale.y = 50
   waterContainer.filters = [displacementFilter, blurFilter]
 
-  var renderTexture = PIXI.RenderTexture.create(particleArea.width, particleArea.height)
+  var renderTexture = PIXI.RenderTexture.create(airArea.width, airArea.height)
   var waterSprite = new PIXI.Sprite(renderTexture)
-  waterSprite.scale.y = -waterAreaRatio / particleAreaRatio
+  waterSprite.scale.y = -waterAreaRatio / airAreaRatio
   waterSprite.position.y = waterArea.height
   waterContainer.addChild(waterSprite)
 
@@ -88,7 +98,7 @@ function startApp() {
   app.ticker.add(delta => {
     count += 0.1 * delta
 
-    app.renderer.render(particleContainer, renderTexture)
+    app.renderer.render(airContainer, renderTexture)
 
     displacementFilter.x = count * 10
     displacementFilter.y = count * 10
@@ -114,15 +124,15 @@ function startApp() {
       particle.update()
 
       if (particle.sprite.x < 0) {
-        particle.sprite.x = particleArea.width
+        particle.sprite.x = airArea.width
       }
-      if (particleArea.width < particle.sprite.x) {
+      if (airArea.width < particle.sprite.x) {
         particle.sprite.x = 0.0
       }
       if (particle.sprite.y < 0) {
-        particle.sprite.y = particleArea.height
+        particle.sprite.y = airArea.height
       }
-      if (particleArea.height < particle.sprite.y) {
+      if (airArea.height < particle.sprite.y) {
         particle.sprite.y = 0.0
       }
     })
@@ -136,7 +146,7 @@ const createParticle = pos => {
   const radius = Math.random() + 1.0
 
   const graphics = new PIXI.Graphics()
-  graphics.beginFill(0xF2FE00, 0.65)
+  graphics.beginFill(0xFFFFFF, 0.65)
   graphics.drawCircle(0.0, 0.0, radius)
   graphics.endFill()
   const sprite = new PIXI.Sprite(graphics.generateCanvasTexture())
