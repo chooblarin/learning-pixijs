@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@pixi/filter-glow": "^2.0.0",
+    "pixi-particles": "^2.1.5",
     "pixi.js": "^4.5.4"
   }
 }

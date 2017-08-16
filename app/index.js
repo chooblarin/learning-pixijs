@@ -1,4 +1,4 @@
-import startApp from './mesh/onibi'
+import startApp from './particle/onibi'
 import styles from './styles/app.css'
 
 startApp()
